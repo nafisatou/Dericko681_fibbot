@@ -1,14 +1,14 @@
-# Use the official Rust image as a base
+# Use the official Rust image
 FROM rust:latest
 
-# Create a new directory for the action
+# Set the working directory
 WORKDIR /usr/src/fibbot
 
-# Copy the Rust project files into the container
+# Copy the current directory contents into the container at /usr/src/fibbot
 COPY . .
 
-# Build the Rust project
-RUN cargo install --path .
+# Build the Rust application
+RUN cargo build --release
 
-# Set the entry point for the action
-ENTRYPOINT ["fibbot"]
+# Run the application
+ENTRYPOINT ["./target/release/fibbot"]
