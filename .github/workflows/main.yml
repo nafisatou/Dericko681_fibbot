@@ -1,25 +1,26 @@
-name: Test FibBot
+name: Fibonacci Bot
 
+# on:
+#   pull_request:
+#     types: [opened, edited]
 on:
   push:
     branches:
       - main
 
 jobs:
-  build:
+  run-fibbot:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Install Rust
-        run: |
-          curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
-          source $HOME/.cargo/env
-          rustup default stable
-
-      - name: Build FibBot
-        run: cargo build --release
-
-      - name: Run FibBot
-        run: target/release/fibbot
+      - name: Run Fibonacci Action
+        uses: ./  # This references the action in the current repository
+        with:
+          enable_fib: 'true'  # Set to 'true' or 'false'
+          threshold: '10'      # Adjust as needed
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_BODY: ${{ github.event.pull_request.body }}
