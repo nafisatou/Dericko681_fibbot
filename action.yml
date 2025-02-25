@@ -10,5 +10,5 @@ inputs:
     required: false
     default: '10'
 runs:
-  using: 'docker'
-  image: 'Dockerfile'
+  using: 'rust'
+  main: 'target/release/fibbot'
