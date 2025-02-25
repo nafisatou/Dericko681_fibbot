@@ -12,14 +12,9 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Install Rust
-        run: |
-          curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
-          source $HOME/.cargo/env
-          rustup default stable
-
-      - name: Build FibBot
-        run: cargo build --release
-
-      - name: Run FibBot
-        run: target/release/fibbot
+      - name: Build and Run FibBot Action
+        uses: docker://fibbot:latest
+        with:
+          args: 
+            - enable_fibonacci=true
+            - threshold=10
