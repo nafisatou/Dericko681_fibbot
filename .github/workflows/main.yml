@@ -12,9 +12,13 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Build and Run FibBot Action
-        uses: docker://fibbot:latest
+      - name: Set up Rust
+        uses: actions/setup-rust@v1
         with:
-          args: 
-            - enable_fibonacci=true
-            - threshold=10
+          toolchain: stable
+
+      - name: Build FibBot
+        run: cargo build --release
+
+      - name: Run FibBot
+        run: target/release/fibbot
