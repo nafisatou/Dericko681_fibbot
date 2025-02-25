@@ -1,0 +1,14 @@
+name: "FibBot"
+description: "A GitHub Action to calculate Fibonacci numbers from PR content"
+inputs:
+  enable_fibonacci:
+    description: "Enable Fibonacci calculation"
+    required: false
+    default: "true"
+  threshold:
+    description: "Threshold limit for Fibonacci calculation"
+    required: false
+    default: "10"
+runs:
+  using: "rust"
+  main: "target/release/fibbot"
