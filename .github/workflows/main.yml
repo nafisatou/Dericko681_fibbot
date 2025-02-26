@@ -1,12 +1,12 @@
 name: Fibonacci Bot
 
-# on:
-#   pull_request:
-#     types: [opened, edited]
 on:
-  push:
-    branches:
-      - main
+  pull_request:
+    types: [opened, edited]
+# on:
+#   push:
+#     branches:
+#       - main
 
 jobs:
   run-fibbot:
@@ -16,10 +16,10 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Run Fibonacci Action
-        uses: ./  # This references the action in the current repository
+        uses: ./  
         with:
-          enable_fib: 'true'  # Set to 'true' or 'false'
-          threshold: '10'      # Adjust as needed
+          enable_fib: 'true'  
+          threshold: '10'      
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PR_NUMBER: ${{ github.event.pull_request.number }}

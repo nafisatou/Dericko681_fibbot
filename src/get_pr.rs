@@ -1,11 +1,5 @@
-use std::env;
 
-use reqwest::Client;
-use serde_json::Value;
-
-use crate::extract::extract_numbers;
-
-pub async fn read_pull_request_and_extract() -> Result<Vec<u32>, Box<dyn std::error::Error>> {
+async fn read_pull_request_and_extract() -> Result<Vec<u32>, Box<dyn std::error::Error>> {
     // Get GitHub token and other parameters from the environment
     let token = env::var("GITHUB_TOKEN")?;
     let pr_number: u32 = env::var("PR_NUMBER")?.parse()?;
