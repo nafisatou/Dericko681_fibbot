@@ -1,5 +1,6 @@
-mod extract; mod fibonacci; mod get_pr;
+mod extract; mod fibonacci; mod get_pr; mod post_comment;
 use fibonacci::fibonacci_up_to;
+use post_comment::post_comment;
 use get_pr::get_pr_body;
 use extract::extract_numbers;
 
@@ -16,7 +17,8 @@ fn main() {
             println!("Extracted numbers: {:?}", extracted_numbers);
             for number in extracted_numbers{
 
-               println!("The fibonacci of {} is: {:?}", number,fibonacci_up_to(number));
+            //    println!("The fibonacci of {} is: {:?}", number,fibonacci_up_to(number));
+            post_comment(pr_number, owner, repo, fibonacci_up_to(number));
             }
 
         }
