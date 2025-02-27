@@ -1,4 +1,4 @@
-name: Fibonacci Bot
+name: Fibbot
 
 on:
   pull_request:

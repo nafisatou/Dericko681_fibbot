@@ -23,12 +23,12 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     //     std::process::exit(1);
     // }
 
-    let extracted_numbers = read_pull_request_and_extract().await?;
+    // let extracted_numbers = read_pull_request_and_extract().await?;
 
-    for number in extracted_numbers {
-        let fib_sequence = fibonacci_up_to(number);
-        println!("Extracted Number: {}, Fibonacci Sequence: {:?}", number, fib_sequence);
-    }
+    // for number in extracted_numbers {
+    //     let fib_sequence = fibonacci_up_to(number);
+    //     println!("Extracted Number: {}, Fibonacci Sequence: {:?}", number, fib_sequence);
+    // }
 
     Ok(())
 
