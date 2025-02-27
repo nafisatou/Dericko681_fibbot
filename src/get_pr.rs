@@ -6,7 +6,7 @@ async fn read_pull_request_and_extract() -> Result<Vec<u32>, Box<dyn std::error:
 
     // Fetch the pull request content
     let url = format!(
-        "https://api.github.com/repos/{}/{}/pulls/{}",
+        "https://api.github.com/repos/dericko681/fibbot/pulls/{}",
         env::var("GITHUB_REPOSITORY_OWNER")?,
         env::var("GITHUB_REPOSITORY_NAME")?,
         pr_number
