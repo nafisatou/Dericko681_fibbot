@@ -1,41 +1,51 @@
 use std::env;
+use dotenv::dotenv;
 
+use extract::extract_numbers;
 use fibonacci::fibonacci_up_to;
-use get_pr::read_pull_request_and_extract;
-mod fibonacci; mod extract; mod get_pr;
+use get_pr::fetch_pull_request_body;
+use post_comment::post_comment;
+mod extract;
+mod fibonacci;
+mod get_pr; mod post_comment;
 
-#[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    // Get inputs from environment variables
-    let enable_fib = env::var("INPUT_ENABLE_FIB").unwrap_or("true".to_string());
-    let max_threshold: u32 = env::var("INPUT_MAX_THRESHOLD")
-        .unwrap_or("10".to_string())
-        .parse()
-        .unwrap_or(10); // Default to 10 if parsing fails
+fn main() -> Result<(), Box<dyn std::error::Error>> {
 
-    // Log the inputs
-    println!("Enable Fibonacci: {}", enable_fib);
-    println!("Max Threshold: {}", max_threshold);
+    // dotenv().ok();
+    // Get parameters from environment variables
+    let pr_number: u64 = env::var("GITHUB_PULL_REQUEST_NUMBER")?.parse()?;
+    let enable_fibonacci: bool = env::var("ENABLE_FIBONACCI")?.parse().unwrap_or(false);
+    let threshold: u32 = env::var("THRESHOLD").unwrap_or_else(|_| "100".to_string()).parse().unwrap_or(100);
 
-    // Validate max_threshold
-    // if max_threshold == 0 {
-    //     println!("Error: max_threshold must be greater than 0.");
-    //     std::process::exit(1);
-    // }
+    // Fetch the pull request body
+    let body = fetch_pull_request_body(pr_number)?;
 
-    // let extracted_numbers = read_pull_request_and_extract().await?;
+    // Extract numbers from the body
+    let numbers = extract_numbers(body.clone());
 
-    // for number in extracted_numbers {
-    //     let fib_sequence = fibonacci_up_to(number);
-    //     println!("Extracted Number: {}, Fibonacci Sequence: {:?}", number, fib_sequence);
-    // }
+    // Prepare the comment
+    let mut comment = String::new();
+
+    if enable_fibonacci {
+        let mut fib_results = Vec::new();
+        for &number in &numbers {
+            if number <= threshold {
+                fib_results.extend(fibonacci_up_to(number));
+            }
+        }
+        comment = format!(
+            "Fibonacci numbers for extracted values: {:?}",
+            fib_results
+        );
+    } else {
+        comment = format!("Extracted numbers: {:?}", numbers);
+    }
+
+    // Post the comment
+    post_comment(pr_number, &comment)?;
 
     Ok(())
-
-    
 }
-
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -50,3 +60,38 @@ mod tests {
     }
 }
 
+// fn main() -> Result<(), Box<dyn std::error::Error>> {
+//     // Get parameters from environment variables
+
+//     // let enable_fibonacci: bool = env::var("ENABLE_FIBONACCI")?.parse().unwrap_or(false);
+//     // let threshold: u32 = env::var("THRESHOLD").unwrap_or_else(|_| "100".to_string()).parse().unwrap_or(100);
+
+//     // Fetch the pull request body
+   
+
+//     // Extract numbers from the body
+//     let numbers = extract_numbers(body.clone());
+
+//     // Prepare the comment
+//     let mut comment = String::new();
+
+//     if enable_fibonacci {
+//         let mut fib_results = Vec::new();
+//         for &number in &numbers {
+//             if number <= threshold {
+//                 fib_results.extend(fibonacci_up_to(number));
+//             }
+//         }
+//         comment = format!(
+//             "Fibonacci numbers for extracted values: {:?}",
+//             fib_results
+//         );
+//     } else {
+//         comment = format!("Extracted numbers: {:?}", numbers);
+//     }
+
+//     // Post the comment
+//     post_comment(pr_number, &comment)?;
+
+//     Ok(())
+// }

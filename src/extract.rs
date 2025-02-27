@@ -1,4 +1,4 @@
- pub fn extract_numbers(content: &str) -> Vec<u32> {
+ pub fn extract_numbers(content: String) -> Vec<u32> {
     content
         .split_whitespace()
         .filter_map(|word| word.trim_matches(|c: char| !c.is_digit(10)).parse::<u32>().ok())
@@ -13,7 +13,7 @@ mod tests {
 
     #[test]
     fn test_extract_numbers() {
-        let content = "Here are some numbers: 1, 42 and 100.";
+        let content = "Here are some numbers: 1, 42 and 100.".to_string();
         let numbers = extract_numbers(content);
         assert_eq!(numbers, vec![1, 42, 100]);
     }
