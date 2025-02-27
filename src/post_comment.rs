@@ -20,7 +20,7 @@ pub fn post_comment(
         .bearer_auth(token)
         .json(&serde_json::json!({ "body": comment }))
         .send()?;
-    println!("The URL is :", url);
+    println!("The URL is {} :", url);
     if response.status().is_success() {
         Ok(())
     } else {
