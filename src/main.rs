@@ -11,9 +11,14 @@ fn main() {
 
     match get_pr_body(pr_number, owner, repo) {
         Ok(content) => {
-            let numbers = extract_numbers(content);
+            let extracted_numbers = extract_numbers(content);
             // Further processing...
-            println!("Extracted numbers: {:?}", numbers);
+            println!("Extracted numbers: {:?}", extracted_numbers);
+            for number in extracted_numbers{
+
+               println!("The fibonacci of {} is: {:?}", number,fibonacci_up_to(number));
+            }
+
         }
         Err(e) => eprintln!("Error fetching PR body: {}", e),
     }
