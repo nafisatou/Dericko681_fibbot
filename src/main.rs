@@ -18,10 +18,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("Max Threshold: {}", max_threshold);
 
     // Validate max_threshold
-    if max_threshold == 0 {
-        println!("Error: max_threshold must be greater than 0.");
-        std::process::exit(1);
-    }
+    // if max_threshold == 0 {
+    //     println!("Error: max_threshold must be greater than 0.");
+    //     std::process::exit(1);
+    // }
 
     let extracted_numbers = read_pull_request_and_extract().await?;
 
