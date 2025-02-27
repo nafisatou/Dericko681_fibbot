@@ -1,4 +1,7 @@
 use std::env;
+
+use fibonacci::fibonacci_up_to;
+use get_pr::read_pull_request_and_extract;
 mod fibonacci; mod extract; mod get_pr;
 
 #[tokio::main]
