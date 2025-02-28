@@ -24,9 +24,10 @@ fn main() {
                     "Fibonacci numbers up to {}: {:?}",
                     number, fibonacci_results
                 );
+                println!("the comments {}", comment_body);
                 //    println!("The fibonacci of {} is: {:?}", number,fibonacci_up_to(number));
                 match post_comment(pr_number, owner, repo, comment_body) {
-                    Ok(()) => println!("Comment posted successfully!"),
+                    Ok(_) => println!("Comment posted successfully!"),
                     Err(e) => eprintln!("Error posting comment: {}", e),
                 }
             }
