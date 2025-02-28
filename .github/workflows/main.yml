@@ -3,6 +3,9 @@ name: Fibbot
 on:
   pull_request:
     types: [opened, edited]
+permissions:
+  pull-requests: write
+  contents: write
 
 jobs:
   run-fibbot:
