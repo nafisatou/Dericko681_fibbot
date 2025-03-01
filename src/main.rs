@@ -6,14 +6,26 @@ use extract::extract_numbers;
 use fibonacci::fibonacci_up_to;
 use get_pr::get_pr_body;
 use post_comment::post_comment;
+use std::env;
 
 fn main() {
-    // Example values
-    let owner = "dericko681";
-    let repo = "fibbot";
-    let pr_number: u32 = 4;
+        let pr_number: u32 = env::var("GITHUB_EVENT_NUMBER")
+        .expect("GITHUB_EVENT_NUMBER not set")
+        .parse()
+        .expect("GITHUB_EVENT_NUMBER is not a valid number");
+    let repo = env::var("GITHUB_REPOSITORY").expect("GITHUB_REPOSITORY not set");
+    let owner = env::var("GITHUB_REPOSITORY_OWNER").expect("GITHUB_REPOSITORY_OWNER not set");
 
-    match get_pr_body(pr_number, owner, repo) {
+    println!("pr_number: {}", pr_number);
+    println!("repo: {}", repo);
+    println!("owner: {}", owner);
+
+    // Example values
+    // let owner = "dericko681";
+    // let repo = "fibbot";
+    // let pr_number: u32 = 4;
+
+    match get_pr_body(pr_number, &owner, &repo) {
         Ok(content) => {
             let extracted_numbers = extract_numbers(content);
             // Further processing...
@@ -26,7 +38,7 @@ fn main() {
                 );
                 println!("the comments {}", comment_body);
                 //    println!("The fibonacci of {} is: {:?}", number,fibonacci_up_to(number));
-                match post_comment(pr_number, owner, repo, comment_body) {
+                match post_comment(pr_number, &owner, &repo, comment_body) {
                     Ok(_) => println!("Comment posted successfully!"),
                     Err(e) => eprintln!("Error posting comment: {}", e),
                 }
