@@ -9,11 +9,12 @@ use post_comment::post_comment;
 use std::env;
 
 fn main() {
-        let pr_number: u32 = env::var("PR_NUMBER")
-        .expect("GITHUB_EVENT_NUMBER not set")
-        .parse()
-        .expect("GITHUB_EVENT_NUMBER is not a valid number");
+        // let pr_number: u32 = env::var("PR_NUMBER")
+        // .expect("GITHUB_EVENT_NUMBER not set")
+        // .parse()
+        // .expect("GITHUB_EVENT_NUMBER is not a valid number");
     let repo = env::var("GITHUB_REPOSITORY").expect("GITHUB_REPOSITORY not set");
+    let pr_number = 6;
     let owner = env::var("GITHUB_REPOSITORY_OWNER").expect("GITHUB_REPOSITORY_OWNER not set");
 
     println!("pr_number: {}", pr_number);
