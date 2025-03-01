@@ -11,7 +11,7 @@ fn main() {
     // Example values
     let owner = "dericko681";
     let repo = "fibbot";
-    let pr_number: u32 = 1;
+    let pr_number: u32 = 4;
 
     match get_pr_body(pr_number, owner, repo) {
         Ok(content) => {
