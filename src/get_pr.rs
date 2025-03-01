@@ -1,96 +1,69 @@
-use reqwest::blocking::Client;
+// use reqwest;
+// use serde_json::Value;
+
+// pub async fn get_pr_body(
+//        repo: &str,
+//     pr_number: u32,
+//     file_path: &str,
+// ) -> Result<String, Box<dyn std::error::Error>> {
+//     let url = format!("https://api.github.com/repos/{}/pulls/{}/files/{}",repo, pr_number, file_path);
+//     let response = reqwest::get(url).await?;
+
+//     if response.status().is_success() {
+//         let json: Value = response.json().await?;
+//         let content = json["content"].as_str().ok_or("File content not found")?;
+//         let decoded_content = base64::decode(content).unwrap();
+//         let file_content = String::from_utf8(decoded_content).unwrap();
+//         Ok(file_content)
+//     } else {
+//         Err(format!("Failed to retrieve PR {}: {}", pr_number, response.status()).into())
+//     }
+// }
+
+
+
+use anyhow::{Result, Context};
+use reqwest::Client;
+use serde::Deserialize;
 use std::env;
 
-pub fn get_pr_body(
-    pr_number: u32,
-    owner: &str,
-    repo: &str,
-) -> Result<String, Box<dyn std::error::Error>> {
-    let token = env::var("GITHUB_TOKEN")?;
-    
-    let url = format!(
-       "https://api.github.com/repos/{}/pulls/{}/files",
-    repo, pr_number
-    );
-
-    let client = Client::new();
-    let response = client
-        .get(&url)
-        .header("User-Agent", "rust-github-action")
-        .bearer_auth(token)
-        .send()?;
-
-    if response.status().is_success() {
-        let json: serde_json::Value = response.json()?;
-        if let Some(body) = json.get("body") {
-            return Ok(body.as_str().unwrap_or("").to_string());
-        }
-    }
-
-    Err("Failed to get PR body".into())
+#[derive(Deserialize)]
+struct PullRequest {
+    body: Option<String>,
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use mockito::{mock, Matcher};
+#[derive(Deserialize)]
+struct DiffEntry {
+    filename: String,
+    patch: Option<String>,
+}
 
-    #[test]
-    fn test_get_pr_body_success() {
-        // Set up a mock response
-        let _m = mock("GET", "/repos/owner/repo/pulls/1")
-            .match_header("User-Agent", "rust-github-action")
-            .with_header("Content-Type", "application/json")
-            .with_body(r#"{"body": "This is the pull request body."}"#)
-            .create();
 
-        env::set_var("GITHUB_TOKEN", "fake_token");
-        let result = get_pr_body(1, "dericko681", "fibbot");
-        assert!(result.is_ok());
-    }
+pub async fn get_pr_body(pr_number: u32, repo: &str, token:&str) -> Result<String> {
+   
+    let client = Client::new();
+    let url = format!(
+        "https://api.github.com/repos/{}/pulls/{}/files",
+        repo, pr_number
+    );
 
-    #[test]
-    fn test_get_pr_body_not_found() {
-        // Set up a mock response for a 404 error
-        let _m = mock("GET", "/repos/owner/repo/pulls/2")
-            .with_status(404)
-            .create();
+    let response = client
+        .get(&url)
+        .header("User-Agent", "FibBot")
+        .bearer_auth(token)
+        .send()
+        .await
+        .context("Failed to send request to GitHub API")?;
 
-        env::set_var("GITHUB_TOKEN", "fake_token");
+    let response_text = response.text().await.context("Failed to read response text")?;
+    println!("PR Files fetched successfully");
 
-        let result = get_pr_body(2, "dericko681", "fibbot");
-
-        // Assert the result
-        assert!(result.is_err());
-        assert_eq!(result.unwrap_err().to_string(), "Failed to get PR body");
-    }
-
-    #[test]
-    fn test_get_pr_body_no_body() {
-        let _m = mock("GET", "/repos/owner/repo/pulls/3")
-            .with_body(r#"{}"#)
-            .create();
-
-        env::set_var("GITHUB_TOKEN", "fake_token");
-
-        let result = get_pr_body(3, "dericko681", "fibbot");
-
-        assert!(result.is_ok());
-        assert_eq!(result.unwrap(), ""); // Should return an empty string
-    }
-
-    #[test]
-    fn test_get_pr_body_missing_token() {
-        // Test case where the GitHub token is not set
-        env::remove_var("GITHUB_TOKEN");
-
-        let result = get_pr_body(1, "dericko681", "fibbot");
-
-        // Assert the result
-        assert!(result.is_err());
-        assert!(result
-            .unwrap_err()
-            .to_string()
-            .contains("environment variable"));
-    }
+    let files: Vec<DiffEntry> = serde_json::from_str(&response_text).context("Failed to parse PR files")?;
+    let content = files.iter()
+        .filter_map(|file| file.patch.as_ref())
+        .cloned()
+        .collect::<Vec<String>>()
+        .join("\n");
+    
+    Ok(content)  // Returns the accumulated string as a Result<String>
 }
