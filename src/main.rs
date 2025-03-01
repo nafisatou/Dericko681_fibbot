@@ -3,48 +3,44 @@ mod fibonacci;
 mod get_pr;
 mod post_comment;
 use extract::extract_numbers;
-use fibonacci::fibonacci_up_to;
+use fibonacci::fibonacci;
 use get_pr::get_pr_body;
 use post_comment::post_comment;
 use std::env;
 #[tokio::main]
 async fn main() {
-    //   // 2 3 5 hello
-    let pr_number: u32 = env::var("PR_NUMBER")
-        .expect("GITHUB_EVENT_NUMBER not set")
-        .parse()
-        .expect("GITHUB_EVENT_NUMBER is not a valid number");
-    let repo = env::var("GITHUB_REPOSITORY").expect("GITHUB_REPOSITORY not set");
-    // let pr_number = 6;
-    let owner = env::var("GITHUB_REPOSITORY_OWNER").expect("GITHUB_REPOSITORY_OWNER not set");
-    println!("pr_number: {}", pr_number);
-    println!("repo: {}", repo);
-    println!("owner: {}", owner);
+   
 
     //     // Example values
     //     // let owner = "dericko681";
     //     // let repo = "fibbot";
     //     // let pr_number: u32 = 4;
+
+    let pr_number: u64 = env::var("PR_NUMBER")
+    .expect("COULDN'T GET PR_NUMBER")
+    .parse::<u64>()
+    .expect("invalid pr number");
     
 
-    let content = get_pr_body(pr_number as u64, &owner, &repo).await ;
-        // Ok(content) => {
-            let extracted_numbers = extract_numbers(content);
-            // Further processing...
-            println!("Extracted numbers: {:?}", extracted_numbers);
-            for number in extracted_numbers {
-                let fibonacci_results = fibonacci_up_to(number);
-                let comment_body = format!(
-                    "Fibonacci numbers up to {}: {:?}",
-                    number, fibonacci_results
-                );
-                format!("the comments {}", comment_body).to_string();
-                //    println!("The fibonacci of {} is: {:?}", number,fibonacci_up_to(number));
-                match post_comment(pr_number, &owner, &repo, comment_body) {
-                    Ok(_) => println!("Comment posted successfully!"),
-                    Err(e) => eprintln!("Error posting comment: {}", e),
-                }
-            }
+    let pr_numbers = get_pr_body(pr_number).await;
+    println!("Extracted numbers: {:?}", pr_numbers);
+
+    let pr_fib = extract_numbers(pr_numbers);
+
+
+
+    if pr_fib.is_empty() {
+        println!("No numbers found in this pull_request.");
+    }
+    let mut response =
+        String::from("#### Fibonacci output of each number in the pull_request is:\n");
+    for &num in &pr_fib {
+        let fib = fibonacci(num);
+        response.push_str(&format!("- Fibonacci({}) = {}\n", num, fib));
+    }
+        if let Err(e) = post_comment(&response).await {
+            eprintln!("Error posting comment: {}", e);
+        }
         // }
         // Err(e) => eprintln!("Error fetching PR body: {}", e),
     }

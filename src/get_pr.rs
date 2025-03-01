@@ -9,7 +9,7 @@
 //     let url = format!("https://api.github.com/repos/{}/{}/pulls/{}/files", owner, repo, pr_number);
 //     let response = reqwest::get(url).await?;
 
-use octocrab::models::repos::Content;
+// use octocrab::models::repos::Content;
 
 //     if response.status().is_success() {
 //         let json: Value = response.json().await?;
@@ -24,8 +24,8 @@ use octocrab::models::repos::Content;
 //         Err(format!("Failed to retrieve PR {}: {}", pr_number, response.status()).into())
 //     }
 // }
-pub async fn get_pr_body(pr_number:u64, owner: &str, repo: &str)-> String{
-   let content = octocrab::instance().pulls(owner, repo).list_files(pr_number).await;
+pub async fn get_pr_body(pr_number:u64)-> String{
+   let content = octocrab::instance().pulls("Dericko681", "fibbot").list_files(pr_number).await;
     let content = content.unwrap().items.first().unwrap().patch.clone().unwrap();
    content
 }
