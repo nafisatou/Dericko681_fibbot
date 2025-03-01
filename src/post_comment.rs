@@ -3,7 +3,7 @@ use std::env;
 
 pub fn post_comment(pr_number: u32, owner: &str, repo: &str, comment: String) -> Result<(), Box<dyn std::error::Error>> {
     let token = env::var("GITHUB_TOKEN")?;
-    let url = format!("https://api.github.com/repos/{}/{}/issues/{}/comments", owner, repo, pr_number);
+    let url = format!("https://api.github.com/repos/{}/issues/{}/comments", repo, pr_number);
 
     let client = Client::new();
     let response = client
