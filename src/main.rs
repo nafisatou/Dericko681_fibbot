@@ -9,7 +9,7 @@ use post_comment::post_comment;
 use std::env;
 
 fn main() {
-        let pr_number: u32 = env::var("GITHUB_EVENT_NUMBER")
+        let pr_number: u32 = env::var("PR_NUMBER")
         .expect("GITHUB_EVENT_NUMBER not set")
         .parse()
         .expect("GITHUB_EVENT_NUMBER is not a valid number");
